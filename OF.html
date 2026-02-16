@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Współdzielona Galeria Zdjęć</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        #root {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .setup-screen {
+            padding: 60px 40px;
+        }
+
+        .setup-screen h1 {
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .setup-steps {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+        }
+
+        .setup-steps h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .setup-steps ol {
+            margin-left: 20px;
+            line-height: 2.2;
+        }
+
+        .setup-steps li {
+            margin-bottom: 15px;
+        }
+
+        .setup-steps code {
+            background: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            color: #e74c3c;
+            font-size: 13px;
+        }
+
+        .setup-steps a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .setup-steps a:hover {
+            text-decoration: underline;
+        }
+
+        .input-section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin: 20px 0;
+            border: 2px solid #e0e0e0;
+        }
+
+        .input-section label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .input-section input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: monospace;
+        }
+
+        .input-section input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .setup-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-top: 20px;
+        }
+
+        .setup-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            border: 2px solid #2196f3;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .info-box h4 {
+            color: #1565c0;
+            margin-bottom: 10px;
+        }
+
+        .info-box p {
+            color: #1565c0;
+            line-height: 1.6;
+        }
+
+        .login-screen {
+            padding: 60px 40px;
+            text-align: center;
+        }
+
+        .login-screen h1 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 2.5em;
+        }
+
+        .login-screen p {
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 1.1em;
+        }
+
+        .login-form {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .role-selector {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .role-btn {
+            flex: 1;
+            padding: 20px;
+            border: 3px solid #e0e0e0;
+            border-radius: 15px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 16px;
+        }
+
+        .role-btn:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .role-btn.active {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .role-btn h3 {
+            margin-bottom: 8px;
+        }
+
+        .role-btn p {
+            font-size: 0.9em;
+            opacity: 0.8;
+            margin: 0;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            text-align: left;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .error-message {
+            color: #e74c3c;
+            margin-top: 15px;
+            padding: 12px;
+            background: #fef5f5;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .gallery-screen {
+            padding: 40px;
+        }
+
+        .gallery-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .gallery-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .gallery-title h1 {
+            color: #333;
+            font-size: 2em;
+        }
+
+        .badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .badge.admin {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .badge.viewer {
+            background: #3498db;
+            color: white;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .refresh-btn {
+            padding: 12px 20px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .refresh-btn:hover {
+            background: #2980b9;
+        }
+
+        .logout-btn {
+            padding: 12px 25px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: #c0392b;
+        }
+
+        .upload-section {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 40px;
+            border: 2px dashed #667eea;
+        }
+
+        .upload-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .url-input-group {
+            margin-bottom: 15px;
+        }
+
+        .url-input-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .url-input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .add-url-btn {
+            width: 100%;
+            padding: 15px;
+            background: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .add-url-btn:hover:not(:disabled) {
+            background: #229954;
+        }
+
+        .add-url-btn:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+        }
+
+        .upload-hint {
+            margin-top: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .upload-hint strong {
+            color: #667eea;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: #666;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .photos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .photo-card {
+            position: relative;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .photo-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .photo-card img {
+            width: 100%;
+            height: 280px;
+            object-fit: cover;
+            display: block;
+            cursor: pointer;
+        }
+
+        .photo-info {
+            padding: 15px;
+            background: white;
+        }
+
+        .photo-date {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .delete-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(231, 76, 60, 0.95);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .delete-btn:hover {
+            background: rgba(192, 57, 43, 1);
+            transform: scale(1.1);
+        }
+
+        .no-photos {
+            text-align: center;
+            color: #95a5a6;
+            padding: 80px 20px;
+            font-size: 18px;
+        }
+
+        .no-photos-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            position: relative;
+            max-width: 95%;
+            max-height: 95%;
+        }
+
+        .modal img {
+            max-width: 100%;
+            max-height: 90vh;
+            border-radius: 10px;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: -50px;
+            right: 0;
+            color: white;
+            font-size: 40px;
+            cursor: pointer;
+            background: rgba(0, 0, 0, 0.5);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+        }
+
+        .modal-close:hover {
+            background: rgba(231, 76, 60, 0.8);
+        }
+
+        @media (max-width: 768px) {
+            .gallery-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .header-actions {
+                flex-direction: column;
+            }
+
+            .photos-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 15px;
+            }
+
+            .photo-card img {
+                height: 180px;
+            }
+
+            .upload-section {
+                padding: 20px;
+            }
+
+            .login-screen, .setup-screen {
+                padding: 40px 20px;
+            }
+
+            .role-selector {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        const VIEWER_PASSWORD = "Rafałek69";
+        const ADMIN_PASSWORD = "Admin123"; // Zmień to hasło!
+
+        function App() {
+            const [isSetup, setIsSetup] = useState(false);
+            const [gistId, setGistId] = useState('');
+            const [githubToken, setGithubToken] = useState('');
+            const [isLoggedIn, setIsLoggedIn] = useState(false);
+            const [userRole, setUserRole] = useState(null);
+            const [selectedRole, setSelectedRole] = useState('viewer');
+            const [password, setPassword] = useState('');
+            const [error, setError] = useState('');
+            const [photos, setPhotos] = useState([]);
+            const [loading, setLoading] = useState(false);
+            const [newPhotoUrl, setNewPhotoUrl] = useState('');
+            const [modalPhoto, setModalPhoto] = useState(null);
+
+            useEffect(() => {
+                const savedGistId = localStorage.getItem('gist_id');
+                const savedToken = localStorage.getItem('github_token');
+                
+                if (savedGistId && savedToken) {
+                    setGistId(savedGistId);
+                    setGithubToken(savedToken);
+                    setIsSetup(true);
+                    loadPhotos(savedGistId, savedToken);
+                }
+            }, []);
+
+            const handleSetup = () => {
+                if (!gistId.trim() || !githubToken.trim()) {
+                    alert('Proszę wypełnić wszystkie pola!');
+                    return;
+                }
+                
+                localStorage.setItem('gist_id', gistId.trim());
+                localStorage.setItem('github_token', githubToken.trim());
+                setIsSetup(true);
+                loadPhotos(gistId.trim(), githubToken.trim());
+            };
+
+            const loadPhotos = async (gid, token) => {
+                setLoading(true);
+                try {
+                    const response = await fetch(`https://api.github.com/gists/${gid}`, {
+                        headers: {
+                            'Authorization': `token ${token}`
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        const content = data.files['gallery.json'].content;
+                        const galleryData = JSON.parse(content);
+                        setPhotos(galleryData.photos || []);
+                    } else {
+                        console.error('Error loading photos:', response.status);
+                        setPhotos([]);
+                    }
+                } catch (err) {
+                    console.error('Error:', err);
+                    setPhotos([]);
+                }
+                setLoading(false);
+            };
+
+            const savePhotos = async (newPhotos) => {
+                try {
+                    const response = await fetch(`https://api.github.com/gists/${gistId}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Authorization': `token ${githubToken}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            files: {
+                                'gallery.json': {
+                                    content: JSON.stringify({ photos: newPhotos }, null, 2)
+                                }
+                            }
+                        })
+                    });
+
+                    if (response.ok) {
+                        setPhotos(newPhotos);
+                        return true;
+                    } else {
+                        throw new Error('Failed to save');
+                    }
+                } catch (err) {
+                    console.error('Error saving photos:', err);
+                    alert('Błąd podczas zapisywania. Spróbuj ponownie.');
+                    return false;
+                }
+            };
+
+            const handleLogin = () => {
+                setError('');
+                
+                if (selectedRole === 'admin' && password === ADMIN_PASSWORD) {
+                    setIsLoggedIn(true);
+                    setUserRole('admin');
+                } else if (selectedRole === 'viewer' && password === VIEWER_PASSWORD) {
+                    setIsLoggedIn(true);
+                    setUserRole('viewer');
+                } else {
+                    setError('Nieprawidłowe hasło!');
+                }
+            };
+
+            const handleLogout = () => {
+                setIsLoggedIn(false);
+                setUserRole(null);
+                setPassword('');
+                setError('');
+                setNewPhotoUrl('');
+            };
+
+            const handleAddPhoto = async () => {
+                if (!newPhotoUrl.trim()) return;
+
+                const newPhotos = [...photos, {
+                    id: Date.now(),
+                    url: newPhotoUrl.trim(),
+                    date: new Date().toISOString()
+                }];
+
+                const success = await savePhotos(newPhotos);
+                if (success) {
+                    setNewPhotoUrl('');
+                }
+            };
+
+            const handleDelete = async (id) => {
+                if (confirm('Czy na pewno chcesz usunąć to zdjęcie?')) {
+                    const newPhotos = photos.filter(photo => photo.id !== id);
+                    await savePhotos(newPhotos);
+                }
+            };
+
+            const handleRefresh = () => {
+                loadPhotos(gistId, githubToken);
+            };
+
+            const formatDate = (dateString) => {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('pl-PL', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            };
+
+            if (!isSetup) {
+                return (
+                    <div className="container">
+                        <div className="setup-screen">
+                            <h1>⚙️ Konfiguracja Galerii (jednorazowa, 5 min)</h1>
+                            
+                            <div className="setup-steps">
+                                <h3>📝 Instrukcja:</h3>
+                                <ol>
+                                    <li>Przejdź na <a href="https://github.com" target="_blank">github.com</a> i zaloguj się (lub zarejestruj bezpłatnie)</li>
+                                    <li>Przejdź na <a href="https://gist.github.com" target="_blank">gist.github.com</a></li>
+                                    <li>Utwórz nowy Gist:
+                                        <ul style={{marginTop: '10px', marginLeft: '20px'}}>
+                                            <li>Nazwa pliku: <code>gallery.json</code></li>
+                                            <li>Zawartość: <code>{`{"photos": []}`}</code></li>
+                                            <li>Kliknij "Create secret gist"</li>
+                                        </ul>
+                                    </li>
+                                    <li>Skopiuj <strong>Gist ID</strong> z URL (np. <code>abc123def456...</code>)</li>
+                                    <li>Przejdź na <a href="https://github.com/settings/tokens" target="_blank">github.com/settings/tokens</a></li>
+                                    <li>Kliknij "Generate new token" → "Generate new token (classic)"</li>
+                                    <li>Nazwa: <code>Gallery Access</code>, zaznacz tylko <code>gist</code>, kliknij "Generate"</li>
+                                    <li>Skopiuj wygenerowany <strong>token</strong> (zaczyna się od <code>ghp_...</code>)</li>
+                                    <li>Wklej oba poniżej i zapisz</li>
+                                </ol>
+                            </div>
+
+                            <div className="info-box">
+                                <h4>✅ Zalety GitHub Gist:</h4>
+                                <p>
+                                    • Całkowicie DARMOWE<br/>
+                                    • Bez limitów na ilość zdjęć<br/>
+                                    • Zdjęcia przechowywane jako linki URL<br/>
+                                    • Działa na zawsze (GitHub jest stabilny)
+                                </p>
+                            </div>
+
+                            <div className="input-section">
+                                <label>🆔 Gist ID:</label>
+                                <input 
+                                    type="text"
+                                    value={gistId}
+                                    onChange={(e) => setGistId(e.target.value)}
+                                    placeholder="abc123def456..."
+                                />
+                            </div>
+
+                            <div className="input-section">
+                                <label>🔑 GitHub Token:</label>
+                                <input 
+                                    type="text"
+                                    value={githubToken}
+                                    onChange={(e) => setGithubToken(e.target.value)}
+                                    placeholder="ghp_..."
+                                />
+                            </div>
+
+                            <button className="setup-btn" onClick={handleSetup}>
+                                💾 Zapisz i kontynuuj
+                            </button>
+                        </div>
+                    </div>
+                );
+            }
+
+            if (!isLoggedIn) {
+                return (
+                    <div className="container">
+                        <div className="login-screen">
+                            <h1>📸 Współdzielona Galeria</h1>
+                            <p>Wybierz swoją rolę i wprowadź hasło</p>
+                            
+                            <div className="login-form">
+                                <div className="role-selector">
+                                    <div 
+                                        className={`role-btn ${selectedRole === 'viewer' ? 'active' : ''}`}
+                                        onClick={() => setSelectedRole('viewer')}
+                                    >
+                                        <h3>👀 Widz</h3>
+                                        <p>Przeglądaj zdjęcia</p>
+                                    </div>
+                                    <div 
+                                        className={`role-btn ${selectedRole === 'admin' ? 'active' : ''}`}
+                                        onClick={() => setSelectedRole('admin')}
+                                    >
+                                        <h3>👑 Administrator</h3>
+                                        <p>Dodawaj i zarządzaj</p>
+                                    </div>
+                                </div>
+
+                                <div className="input-group">
+                                    <label>Hasło dostępu</label>
+                                    <input 
+                                        type="password" 
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
+                                        placeholder={selectedRole === 'admin' ? 'Hasło administratora' : 'Kod dostępu'}
+                                        autoComplete="off"
+                                    />
+                                </div>
+
+                                <button className="login-btn" onClick={handleLogin}>
+                                    Zaloguj się
+                                </button>
+
+                                <div className={`error-message ${error ? 'show' : ''}`}>
+                                    {error}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="container">
+                    <div className="gallery-screen">
+                        <div className="gallery-header">
+                            <div className="gallery-title">
+                                <h1>📸 Galeria Zdjęć</h1>
+                                <span className={`badge ${userRole}`}>
+                                    {userRole === 'admin' ? '👑 Administrator' : '👀 Widz'}
+                                </span>
+                            </div>
+                            <div className="header-actions">
+                                <button className="refresh-btn" onClick={handleRefresh}>
+                                    🔄 Odśwież
+                                </button>
+                                <button className="logout-btn" onClick={handleLogout}>
+                                    Wyloguj
+                                </button>
+                            </div>
+                        </div>
+
+                        {userRole === 'admin' && (
+                            <div className="upload-section">
+                                <h2>
+                                    <span>➕</span> Dodaj nowe zdjęcie
+                                </h2>
+                                <div className="url-input-group">
+                                    <input 
+                                        type="url"
+                                        value={newPhotoUrl}
+                                        onChange={(e) => setNewPhotoUrl(e.target.value)}
+                                        onKeyPress={(e) => e.key === 'Enter' && handleAddPhoto()}
+                                        placeholder="Wklej link do zdjęcia (np. z imgur.com, imgbb.com)"
+                                    />
+                                </div>
+                                <button 
+                                    className="add-url-btn" 
+                                    onClick={handleAddPhoto}
+                                    disabled={!newPhotoUrl.trim() || loading}
+                                >
+                                    Dodaj zdjęcie
+                                </button>
+                                <div className="upload-hint">
+                                    <strong>💡 Jak dodać zdjęcie:</strong><br/>
+                                    1. Wejdź na <strong>imgur.com</strong> lub <strong>imgbb.com</strong><br/>
+                                    2. Prześlij swoje zdjęcie (nie trzeba się rejestrować)<br/>
+                                    3. Kliknij prawym na zdjęcie → "Kopiuj adres obrazu"<br/>
+                                    4. Wklej link powyżej i kliknij "Dodaj zdjęcie"
+                                </div>
+                            </div>
+                        )}
+
+                        {loading && photos.length === 0 ? (
+                            <div className="loading">
+                                <div className="spinner"></div>
+                                <p>Ładowanie zdjęć...</p>
+                            </div>
+                        ) : photos.length === 0 ? (
+                            <div className="no-photos">
+                                <div className="no-photos-icon">📷</div>
+                                <p>Brak zdjęć w galerii</p>
+                                {userRole === 'viewer' && (
+                                    <p style={{fontSize: '14px', marginTop: '10px'}}>
+                                        Administrator jeszcze nie dodał żadnych zdjęć
+                                    </p>
+                                )}
+                            </div>
+                        ) : (
+                            <div className="photos-grid">
+                                {photos.map(photo => (
+                                    <div key={photo.id} className="photo-card">
+                                        <img 
+                                            src={photo.url} 
+                                            alt="Zdjęcie"
+                                            onClick={() => setModalPhoto(photo)}
+                                        />
+                                        {userRole === 'admin' && (
+                                            <button 
+                                                className="delete-btn" 
+                                                onClick={() => handleDelete(photo.id)}
+                                            >
+                                                ×
+                                            </button>
+                                        )}
+                                        <div className="photo-info">
+                                            <div className="photo-date">
+                                                📅 {formatDate(photo.date)}
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    <div 
+                        className={`modal ${modalPhoto ? 'show' : ''}`}
+                        onClick={() => setModalPhoto(null)}
+                    >
+                        {modalPhoto && (
+                            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                                <span className="modal-close" onClick={() => setModalPhoto(null)}>×</span>
+                                <img src={modalPhoto.url} alt="Zdjęcie" />
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>
